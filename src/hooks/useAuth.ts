@@ -9,7 +9,8 @@ import {
   createUserWithEmailAndPassword, 
   signOut,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from "@/hooks/use-toast";
@@ -71,7 +72,27 @@ export const useAuth = () => {
       }
   }
 
-  return { user, isLoading, signIn: handleSignIn, signUp: handleSignUp, signOut: handleSignOut };
+  const handleResetPassword = async (data: { email: string }) => {
+    setIsLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, data.email);
+      toast({ title: 'Reset email sent!', description: 'Check your email for password reset instructions.' });
+    } catch (error: any) {
+      console.error("Password reset error", error);
+      toast({ title: 'Reset Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { 
+    user, 
+    isLoading, 
+    signIn: handleSignIn, 
+    signUp: handleSignUp, 
+    signOut: handleSignOut,
+    resetPassword: handleResetPassword 
+  };
 };
 
 export const useIsLoggedIn = () => {

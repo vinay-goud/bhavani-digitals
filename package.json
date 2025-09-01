@@ -2,6 +2,9 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
@@ -12,12 +15,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
     "@firebase/auth": "^1.11.0",
     "@firebase/firestore": "^4.9.1",
     "@firebase/storage": "^0.14.0",
     "@genkit-ai/googleai": "^1.14.1",
     "@genkit-ai/next": "^1.14.1",
-    "@hookform/resolvers": "^4.1.3",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-avatar": "^1.1.3",
@@ -48,29 +51,36 @@
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.6.0",
     "encoding": "^0.1.13",
-    "firebase": "^11.10.0",
     "firebase-admin": "^13.5.0",
-    "framer-motion": "^11.5.7",
     "genkit": "^1.14.1",
     "lucide-react": "^0.475.0",
-    "next": "15.3.3",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
-    "react-hook-form": "^7.54.2",
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@hookform/resolvers": "^5.2.1",
+    "@types/express-serve-static-core": "^5.0.7",
+    "@types/firebase": "^2.4.32",
+    "@types/handlebars": "^4.1.0",
+    "@types/http-errors": "^2.0.5",
+    "@types/next": "^8.0.7",
+    "@types/node": "^20.19.11",
+    "@types/react": "^18.3.24",
+    "@types/react-dom": "^18.3.7",
+    "@types/serve-static": "^1.15.8",
+    "firebase": "^12.2.1",
+    "framer-motion": "^12.23.12",
     "genkit-cli": "^1.14.1",
+    "next": "^15.5.2",
     "postcss": "^8",
+    "react-hook-form": "^7.62.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "zod": "^4.1.5"
   }
 }

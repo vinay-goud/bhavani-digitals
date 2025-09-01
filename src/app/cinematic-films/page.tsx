@@ -43,9 +43,9 @@ export default function FilmsPage() {
       <main className="min-h-screen bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
            <div className="text-center mb-12">
-            <h1 className="font-headline text-4xl md:text-5xl text-foreground">Cinematic Stories</h1>
+            <h1 className="font-headline text-4xl md:text-5xl text-foreground">Cinematic Films</h1>
             <p className="font-body mt-2 text-lg text-muted-foreground">
-              Watch our latest cinematic stories and films.
+              Experience our beautiful cinematic wedding films.
             </p>
           </div>
           
@@ -58,9 +58,9 @@ export default function FilmsPage() {
           {videos && videos.length === 0 && (
              <Card className="max-w-4xl mx-auto bg-secondary/30 shadow-lg">
                 <CardHeader>
-                    <CardTitle className="font-headline text-3xl md:text-4xl text-center">No Films Yet</CardTitle>
+                    <CardTitle className="font-headline text-3xl md:text-4xl text-center">No Cinematic Films Yet</CardTitle>
                     <CardDescription className="font-body text-lg pt-2 text-center">
-                        We're busy creating beautiful films. Please check back soon!
+                        We're busy creating beautiful cinematic films. Please check back soon!
                     </CardDescription>
                 </CardHeader>
              </Card>

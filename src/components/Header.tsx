@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/films", label: "Films" },
+  { href: "/cinematic-films", label: "Cinematic Films" },
   { href: "/booking", label: "Book Now" },
   { href: "/contact", label: "Contact" },
 ];

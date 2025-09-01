@@ -16,7 +16,28 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2, Wand2, Trash2, GripVertical, Mail, Phone, Calendar, MapPin, UploadCloud, Check, PlusCircle, FileUp, Edit, Copy } from 'lucide-react';
+import { Loader2, Wand2, Trash2, GripVertical, Mail, Phone, Calendar, MapPin, UploadCloud, Check, PlusCircle, FileUp, Edit, Copy, Heart, Camera, Sparkles, Film, BookOpen } from 'lucide-react';
+
+const DroneIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M10 10 7 7"/><path d="m10 14-3 3"/>
+        <path d="m14 10 3-3"/><path d="m14 14 3 3"/>
+        <path d="M14.205 4.139a4 4 0 1 1 5.439 5.863"/>
+        <path d="M19.637 14a4 4 0 1 1-5.432 5.868"/>
+        <path d="M4.367 10a4 4 0 1 1 5.438-5.862"/>
+        <path d="M9.795 19.862a4 4 0 1 1-5.429-5.873"/>
+        <rect x="10" y="8" width="4" height="8" rx="1"/>
+    </svg>
+);
+
+const iconMap: Record<string, React.ComponentType<any>> = {
+    Heart,
+    Camera,
+    DroneIcon,
+    Sparkles,
+    Film,
+    BookOpen,
+};
 import { enhanceWebsiteSEO } from '@/ai/flows/enhance-website-seo';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,7 +52,7 @@ import {
     uploadFile,
     getGalleryData,
     saveGalleryData
-} from '@/services/dataService';
+} from '@/services/dataServiceClient';
 
 // Helper to generate a truly unique ID
 const generateUniqueId = () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -580,7 +601,7 @@ export default function AdminPage() {
                             <TabsTrigger value="home-content">Home Page</TabsTrigger>
                             <TabsTrigger value="content">Content</TabsTrigger>
                             <TabsTrigger value="live-events">Live Events</TabsTrigger>
-                            <TabsTrigger value="films">Films</TabsTrigger>
+                            <TabsTrigger value="films">Cinematic Films</TabsTrigger>
                             <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
                         </TabsList>
 
@@ -960,8 +981,8 @@ export default function AdminPage() {
                             <Card>
                                 <CardHeader className="flex flex-row justify-between items-center">
                                     <div>
-                                        <CardTitle>Manage Films</CardTitle>
-                                        <CardDescription>Add, edit, and delete videos on your films page.</CardDescription>
+                                        <CardTitle>Manage Cinematic Films</CardTitle>
+                                        <CardDescription>Add, edit, and delete cinematic films to showcase on your website.</CardDescription>
                                     </div>
                                     <Button onClick={handleNewVideo}><PlusCircle className="mr-2 h-4 w-4"/> New Film</Button>
                                 </CardHeader>
@@ -981,7 +1002,7 @@ export default function AdminPage() {
                                                 </CardFooter>
                                             </Card>
                                         )) : (
-                                            <div className="text-center py-10 text-muted-foreground">No films added yet.</div>
+                                            <div className="text-center py-10 text-muted-foreground">No cinematic films added yet.</div>
                                         )}
                                     </div>
 
@@ -1018,6 +1039,153 @@ export default function AdminPage() {
                                     </div>
                                 </CardContent>
                             </Card>
+                        </TabsContent>
+
+                        <TabsContent value="content" className="mt-8">
+                            <div className="grid gap-8">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>About Section Content</CardTitle>
+                                        <CardDescription>Edit the content that appears in the About section of the home page.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-4">
+                                            {aboutContent.map((paragraph, index) => (
+                                                <div key={index} className="space-y-2">
+                                                    <FormLabel>Paragraph {index + 1}</FormLabel>
+                                                    <Textarea 
+                                                        value={paragraph}
+                                                        onChange={async (e) => {
+                                                            const newContent = [...aboutContent];
+                                                            newContent[index] = e.target.value;
+                                                            const result = await saveData('siteContent', 'about', { id: 'about', about: newContent });
+                                                            if (result.success) {
+                                                                setAboutContent(newContent);
+                                                                toast({ title: 'Success', description: 'About content updated.' });
+                                                            } else {
+                                                                toast({ title: 'Error', description: 'Failed to update about content.', variant: 'destructive' });
+                                                            }
+                                                        }}
+                                                        rows={4}
+                                                        className="resize-none"
+                                                    />
+                                                </div>
+                                            ))}
+                                            <Button 
+                                                variant="outline" 
+                                                onClick={() => {
+                                                    setAboutContent([...aboutContent, "New paragraph"]);
+                                                }}
+                                            >
+                                                <PlusCircle className="mr-2 h-4 w-4" /> Add Paragraph
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Services</CardTitle>
+                                        <CardDescription>Edit your service offerings that appear on the home page.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-4">
+                                            {services.map((service, index) => (
+                                                <Card key={service.id} className="bg-muted/50">
+                                                    <CardContent className="pt-6">
+                                                        <div className="grid gap-4">
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div className="space-y-2">
+                                                                    <FormLabel>Title</FormLabel>
+                                                                    <Input 
+                                                                        value={service.title}
+                                                                        onChange={async (e) => {
+                                                                            const newServices = [...services];
+                                                                            newServices[index] = { ...service, title: e.target.value };
+                                                                            const result = await saveData('services', service.id, newServices[index]);
+                                                                            if (result.success) {
+                                                                                setServices(newServices);
+                                                                                toast({ title: 'Success', description: 'Service updated.' });
+                                                                            } else {
+                                                                                toast({ title: 'Error', description: 'Failed to update service.', variant: 'destructive' });
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <FormLabel>Icon</FormLabel>
+                                                                    <Select 
+                                                                        value={service.icon}
+                                                                        onValueChange={async (value) => {
+                                                                            const newServices = [...services];
+                                                                            newServices[index] = { ...service, icon: value };
+                                                                            const result = await saveData('services', service.id, newServices[index]);
+                                                                            if (result.success) {
+                                                                                setServices(newServices);
+                                                                                toast({ title: 'Success', description: 'Service updated.' });
+                                                                            } else {
+                                                                                toast({ title: 'Error', description: 'Failed to update service.', variant: 'destructive' });
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <SelectTrigger>
+                                                                            <SelectValue />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {Object.keys(iconMap).map((iconName) => (
+                                                                                <SelectItem key={iconName} value={iconName}>
+                                                                                    {iconName}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <FormLabel>Description</FormLabel>
+                                                                <Textarea 
+                                                                    value={service.description}
+                                                                    onChange={async (e) => {
+                                                                        const newServices = [...services];
+                                                                        newServices[index] = { ...service, description: e.target.value };
+                                                                        const result = await saveData('services', service.id, newServices[index]);
+                                                                        if (result.success) {
+                                                                            setServices(newServices);
+                                                                            toast({ title: 'Success', description: 'Service updated.' });
+                                                                        } else {
+                                                                            toast({ title: 'Error', description: 'Failed to update service.', variant: 'destructive' });
+                                                                        }
+                                                                    }}
+                                                                    className="resize-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                            <Button 
+                                                onClick={async () => {
+                                                    const newService = {
+                                                        id: generateUniqueId(),
+                                                        title: "New Service",
+                                                        icon: "Heart",
+                                                        description: "Description of the new service."
+                                                    };
+                                                    const result = await saveData('services', newService.id, newService);
+                                                    if (result.success) {
+                                                        setServices([...services, newService]);
+                                                        toast({ title: 'Success', description: 'New service added.' });
+                                                    } else {
+                                                        toast({ title: 'Error', description: 'Failed to add service.', variant: 'destructive' });
+                                                    }
+                                                }}
+                                            >
+                                                <PlusCircle className="mr-2 h-4 w-4" /> Add Service
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </TabsContent>
 
                         <TabsContent value="seo-tools" className="mt-8">

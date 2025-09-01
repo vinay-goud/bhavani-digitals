@@ -9,17 +9,23 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    },
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "public": ".next",
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "function": "ssrbhavanidigitals"
       }
-    ]
+    ],
+    "predeploy": ["npm run build"]
   }
 }

@@ -38,20 +38,10 @@ type Service = {
   description: string;
 };
 
+// Using empty arrays as default content, images will be loaded from Firebase
 const defaultContent: HomeContent = {
-    heroImages: [
-      { id: "hero1", src: "https://picsum.photos/1920/1080?random=indian-wedding-hero-1", alt: "Indian Hindu Wedding scene", 'data-ai-hint': "indian wedding" },
-      { id: "hero2", src: "https://picsum.photos/1920/1080?random=indian-wedding-hero-2", alt: "Bride and groom at sunset", 'data-ai-hint': "bride groom" },
-      { id: "hero3", src: "https://picsum.photos/1920/1080?random=indian-wedding-hero-3", alt: "Joyful wedding celebration", 'data-ai-hint': "wedding celebration" },
-    ],
-    portfolioImages: [
-      { id: "port1", src: "https://picsum.photos/600/800?random=1", alt: "Wedding photo 1", category: "Weddings" },
-      { id: "port2", src: "https://picsum.photos/800/600?random=2", alt: "Wedding photo 2", category: "Pre-Weddings" },
-      { id: "port3", src: "https://picsum.photos/600/800?random=3", alt: "Wedding photo 3", category: "Receptions" },
-      { id: "port4", src: "https://picsum.photos/800/600?random=4", alt: "Wedding photo 4", category: "Weddings" },
-      { id: "port5", src: "https://picsum.photos/600/800?random=5", alt: "Wedding photo 5", category: "Candid" },
-      { id: "port6", src: "https://picsum.photos/800/600?random=6", alt: "Wedding photo 6", category: "Pre-Weddings" },
-    ]
+    heroImages: [],
+    portfolioImages: []
 };
 
 const DroneIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -120,9 +110,20 @@ export default function Home() {
         getData('siteContent'),
         getData('services'),
       ]);
+      // Type guard function to check if an item is GalleryImage
+      const isGalleryImage = (item: any): item is GalleryImage => {
+        if (!item || typeof item !== 'object') return false;
+        if (!('id' in item) || !('src' in item) || !('alt' in item)) return false;
+        return (
+          typeof item.id === 'string' &&
+          typeof item.src === 'string' &&
+          typeof item.alt === 'string'
+        );
+      };
+
       const loadedContent = {
-        heroImages: heroImagesData.length > 0 ? heroImagesData as any : defaultContent.heroImages,
-        portfolioImages: portfolioImagesData.length > 0 ? portfolioImagesData as any : defaultContent.portfolioImages
+        heroImages: Array.isArray(heroImagesData) ? heroImagesData.filter(isGalleryImage) : [],
+        portfolioImages: Array.isArray(portfolioImagesData) ? portfolioImagesData.filter(isGalleryImage) : []
       };
       setContent(loadedContent);
 
@@ -232,22 +233,31 @@ export default function Home() {
       <main className="flex-1 bg-background relative">
         <BackgroundText />
 
-        <section className="relative h-screen w-full">
-          {content.heroImages.map((image, index) => (
-             <Image
-              key={image.id}
-              src={image.src}
-              alt={image.alt}
-              fill
-              className={cn(
-                "object-cover transition-opacity duration-1000",
-                index === currentHeroIndex ? "opacity-100" : "opacity-0"
-              )}
-              priority={index === 0}
-              data-ai-hint="indian wedding"
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <section className="relative min-h-[100svh] w-full overflow-hidden">
+          {content.heroImages.length > 0 ? (
+            <>
+              {content.heroImages.map((image, index) => (
+                <Image
+                  key={image.id}
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  sizes="100vw"
+                  className={cn(
+                    "object-cover transition-opacity duration-1000",
+                    index === currentHeroIndex ? "opacity-100" : "opacity-0"
+                  )}
+                  priority={index === 0}
+                  data-ai-hint="indian wedding"
+                />
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-secondary/30 flex items-center justify-center">
+              <p className="text-muted-foreground text-lg">No hero images uploaded yet</p>
+            </div>
+          )}
           <div className="relative z-10 flex h-full flex-col items-center justify-end text-center text-white pb-16 sm:pb-24 p-4">
             <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl lg:text-8xl drop-shadow-2xl leading-tight">
               Your Love Story, Beautifully Told
@@ -260,9 +270,9 @@ export default function Home() {
                   <Link href="/booking">Inquire Now</Link>
                 </Button>
                  <Button asChild size="lg" variant="outline" className="bg-transparent text-white border-white hover:bg-white hover:text-black rounded-full px-8 py-6 text-lg shadow-lg transition-transform hover:scale-105">
-                  <Link href="/gallery" className="flex items-center gap-2">
+                  <Link href="/cinematic-films" className="flex items-center gap-2">
                     <PlayCircle className="h-6 w-6" />
-                    <span>Watch Films</span>
+                    <span>Watch Cinematic Films</span>
                   </Link>
                 </Button>
             </div>
@@ -302,38 +312,46 @@ export default function Home() {
               <h2 className="font-headline text-4xl md:text-5xl text-foreground">Our Recent Work</h2>
               <p className="font-body mt-2 text-lg text-muted-foreground">A curated collection of stories we've had the honor to tell.</p>
             </div>
-             <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent>
-                {content.portfolioImages.map((image, index) => (
-                  <CarouselItem key={image.id} className="md:basis-1/2 lg:basis-1/3">
-                    <div className="group relative break-inside-avoid overflow-hidden rounded-lg shadow-lg aspect-[4/3]" onClick={() => openLightbox(index)}>
-                      <div className="cursor-pointer">
-                          <Image
-                            src={image.src}
-                            alt={image.alt}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                            sizes="(max-width: 768px) 50vw, 33vw"
-                          />
-                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-end justify-start">
-                            <p className="text-white font-body p-4 text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              {image.category || "Featured"}
-                            </p>
+            {content.portfolioImages.length > 0 ? (
+              <div>
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent>
+                    {content.portfolioImages.map((image, index) => (
+                      <CarouselItem key={image.id} className="md:basis-1/2 lg:basis-1/3">
+                        <div className="group relative break-inside-avoid overflow-hidden rounded-lg shadow-lg aspect-[4/3]" onClick={() => openLightbox(index)}>
+                          <div className="cursor-pointer">
+                            <Image
+                              src={image.src}
+                              alt={image.alt}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-110"
+                              sizes="(max-width: 768px) 50vw, 33vw"
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-end justify-start">
+                              <p className="text-white font-body p-4 text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                {image.category || "Featured"}
+                              </p>
+                            </div>
                           </div>
-                      </div>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="ml-12"/>
-              <CarouselNext className="mr-12"/>
-            </Carousel>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="ml-12"/>
+                  <CarouselNext className="mr-12"/>
+                </Carousel>
+              </div>
+            ) : (
+              <div className="w-full aspect-[4/3] bg-secondary/30 rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground text-lg">No portfolio images uploaded yet</p>
+              </div>
+            )}
             <div className="text-center mt-12">
               <Button asChild size="lg" variant="outline" className="rounded-full px-10 py-6 text-lg">
                 <Link href="/gallery">View Full Gallery</Link>

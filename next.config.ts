@@ -2,13 +2,15 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, // Temporarily enable this to get a successful build
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
+  output: 'standalone',
+  distDir: '.next',
+  generateBuildId: async () => 'build',
   images: {
     remotePatterns: [
       {

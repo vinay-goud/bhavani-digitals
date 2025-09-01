@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Phone, Loader2 } from 'lucide-react';
@@ -23,6 +22,14 @@ const signupSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+const resetPasswordSchema = z.object({
+  email: z.string().email(),
 });
 
 
@@ -55,7 +62,7 @@ function SignupForm() {
     const { signUp, isLoading } = useAuth();
     const form = useForm<z.infer<typeof signupSchema>>({
         resolver: zodResolver(signupSchema),
-        defaultValues: { name: "", email: "", password: "" }
+        defaultValues: { name: "", email: "", password: "", confirmPassword: "" }
     });
     
     return (
@@ -70,9 +77,34 @@ function SignupForm() {
                 <FormField control={form.control} name="password" render={({ field }) => (
                     <FormItem><FormLabel>Password</FormLabel><FormControl><Input {...field} type="password" placeholder="••••••••" /></FormControl><FormMessage /></FormItem>
                 )} />
+                <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                    <FormItem><FormLabel>Confirm Password</FormLabel><FormControl><Input {...field} type="password" placeholder="••••••••" /></FormControl><FormMessage /></FormItem>
+                )} />
                 <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Create Account
+                </Button>
+            </form>
+        </Form>
+    );
+}
+
+function ResetPasswordForm() {
+    const { resetPassword, isLoading } = useAuth();
+    const form = useForm<z.infer<typeof resetPasswordSchema>>({
+        resolver: zodResolver(resetPasswordSchema),
+        defaultValues: { email: "" }
+    });
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(resetPassword)} className="space-y-4">
+                <FormField control={form.control} name="email" render={({ field }) => (
+                    <FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} placeholder="you@example.com" /></FormControl><FormMessage /></FormItem>
+                )} />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Send Reset Link
                 </Button>
             </form>
         </Form>
@@ -97,15 +129,19 @@ export default function AuthPage() {
                     </CardHeader>
                     <CardContent>
                         <Tabs defaultValue="login" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2">
+                            <TabsList className="grid w-full grid-cols-3">
                                 <TabsTrigger value="login">Login</TabsTrigger>
                                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                                <TabsTrigger value="reset">Reset</TabsTrigger>
                             </TabsList>
                             <TabsContent value="login" className="mt-6">
                                 <LoginForm />
                             </TabsContent>
                             <TabsContent value="signup" className="mt-6">
                                 <SignupForm />
+                            </TabsContent>
+                            <TabsContent value="reset" className="mt-6">
+                                <ResetPasswordForm />
                             </TabsContent>
                         </Tabs>
                         <div className="relative my-6">
