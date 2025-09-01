@@ -4,22 +4,16 @@
  * @fileOverview This file defines a simplified version for static builds.
  */
 
-import { z } from 'genkit';
+export interface GeneratePhotographyStyleGuideInput {
+  shootType: string;
+  brandGuidelines?: string;
+  desiredVisuals: string;
+  trendInspirations?: string;
+}
 
-const GeneratePhotographyStyleGuideInputSchema = z.object({
-  shootType: z.string().describe('The type of photoshoot (e.g., wedding, portrait, fashion).'),
-  brandGuidelines: z.string().optional().describe('Specific brand guidelines to incorporate.'),
-  desiredVisuals: z.string().describe('Description of the desired visual style and mood.'),
-  trendInspirations: z.string().optional().describe('Inspiration from current photography trends.'),
-});
-
-export type GeneratePhotographyStyleGuideInput = z.infer<typeof GeneratePhotographyStyleGuideInputSchema>;
-
-const GeneratePhotographyStyleGuideOutputSchema = z.object({
-  styleGuide: z.string().describe('A detailed photography style guide incorporating best practices, trends, and brand guidelines.'),
-});
-
-export type GeneratePhotographyStyleGuideOutput = z.infer<typeof GeneratePhotographyStyleGuideOutputSchema>;
+export interface GeneratePhotographyStyleGuideOutput {
+  styleGuide: string;
+}
 
 // Temporary mock function for static build
 export async function generatePhotographyStyleGuide(input: GeneratePhotographyStyleGuideInput): Promise<GeneratePhotographyStyleGuideOutput> {

@@ -1,5 +1,4 @@
-import { config } from 'dotenv';
-config();
+'use client';
 
-import '@/ai/flows/generate-photography-style-guide.ts';
-import '@/ai/flows/enhance-website-seo.ts';
+// This file is a placeholder for development-only functionality
+// Not used in static builds

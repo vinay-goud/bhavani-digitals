@@ -1,8 +1,4 @@
 'use client';
 
-// This is a placeholder for client-side initialization
-// The actual AI functionality will be initialized on the client
-export const ai = {
-  definePrompt: () => {},
-  defineFlow: () => {},
-};
+// This file is left empty for client-side builds
+// AI functionality is mocked in individual flow files
