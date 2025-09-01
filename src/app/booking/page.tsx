@@ -172,16 +172,20 @@ export default function BookingPage() {
                                   <Button
                                     variant={"outline"}
                                     className={cn(
-                                      "w-full pl-3 text-left font-normal",
+                                      "w-full min-h-[2.5rem] h-auto pl-3 text-left font-normal break-words whitespace-normal",
                                       !field.value?.length && "text-muted-foreground"
                                     )}
                                   >
-                                    {field.value?.length ? (
-                                      field.value.map(date => format(date, "dd MMM yyyy")).join(", ")
-                                    ) : (
-                                      <span>Select dates</span>
-                                    )}
-                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    <div className="flex-1 overflow-hidden">
+                                      {field.value?.length ? (
+                                        <span className="inline-block">
+                                          {field.value.map(date => format(date, "dd MMM yyyy")).join(", ")}
+                                        </span>
+                                      ) : (
+                                        <span>Select dates</span>
+                                      )}
+                                    </div>
+                                    <CalendarIcon className="ml-2 h-4 w-4 flex-shrink-0 opacity-50" />
                                   </Button>
                                 </FormControl>
                               </PopoverTrigger>

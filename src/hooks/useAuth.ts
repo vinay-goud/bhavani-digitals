@@ -39,15 +39,6 @@ export const useAuth = () => {
         window.location.href = '/admin';
       } else if (provider === 'credentials' && data) {
         const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
-        if (!userCredential.user.emailVerified) {
-          await sendEmailVerification(userCredential.user);
-          await signOut(auth);
-          toast({ 
-            title: 'Email not verified', 
-            description: 'Please check your email for verification link. A new verification email has been sent.' 
-          });
-          return;
-        }
         toast({ title: 'Logged in successfully!' });
         window.location.href = '/admin';
       }
@@ -63,7 +54,11 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      await sendEmailVerification(userCredential.user);
+      const actionCodeSettings = {
+        url: window.location.origin + '/auth', // Redirect back to login page after verification
+        handleCodeInApp: true
+      };
+      await sendEmailVerification(userCredential.user, actionCodeSettings);
       toast({ 
         title: 'Account created!', 
         description: 'Please check your email to verify your account.' 
