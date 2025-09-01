@@ -1,4 +1,3 @@
-'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating photography style guides.
  *

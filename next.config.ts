@@ -1,7 +1,7 @@
 
 import type {NextConfig} from 'next';
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   typescript: {
     ignoreBuildErrors: true, // Temporarily enable this to get a successful build
   },
@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   distDir: '.next',
   generateBuildId: async () => 'build',
   images: {
+    unoptimized: true, // Enable this for static export
     remotePatterns: [
       {
         protocol: 'https',
@@ -33,6 +34,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+} satisfies NextConfig;
 
 export default nextConfig;

@@ -1,8 +1,6 @@
 // The AI analyzes website content and suggests keywords for SEO optimization.
 
-'use server';
-
-import {ai} from '@/ai/genkit';
+import { ai } from '@/ai/genkit';
 import {z} from 'genkit';
 
 const SEOEnhancementInputSchema = z.object({
