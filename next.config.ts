@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: 'standalone',
+  output: 'export',
   distDir: '.next',
   generateBuildId: async () => 'build',
   images: {
