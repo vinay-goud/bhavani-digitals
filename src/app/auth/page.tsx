@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
@@ -129,19 +130,37 @@ export default function AuthPage() {
                     </CardHeader>
                     <CardContent>
                         <Tabs defaultValue="login" className="w-full">
-                            <TabsList className="grid w-full grid-cols-3">
+                            <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="login">Login</TabsTrigger>
                                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                                <TabsTrigger value="reset">Reset</TabsTrigger>
                             </TabsList>
                             <TabsContent value="login" className="mt-6">
                                 <LoginForm />
+                                <div className="mt-4">
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button 
+                                                variant="link" 
+                                                type="button" 
+                                                className="text-sm text-primary hover:text-primary/90 p-0"
+                                            >
+                                                Forgot Password?
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle>Reset Password</DialogTitle>
+                                                <DialogDescription>
+                                                    Enter your email address and we'll send you a link to reset your password.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <ResetPasswordForm />
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
                             </TabsContent>
                             <TabsContent value="signup" className="mt-6">
                                 <SignupForm />
-                            </TabsContent>
-                            <TabsContent value="reset" className="mt-6">
-                                <ResetPasswordForm />
                             </TabsContent>
                         </Tabs>
                         <div className="relative my-6">

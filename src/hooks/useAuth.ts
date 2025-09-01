@@ -10,7 +10,8 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendEmailVerification
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useToast } from "@/hooks/use-toast";
@@ -34,11 +35,22 @@ export const useAuth = () => {
       if (provider === 'google') {
         const googleProvider = new GoogleAuthProvider();
         await signInWithPopup(auth, googleProvider);
+        toast({ title: 'Logged in successfully!' });
+        window.location.href = '/admin';
       } else if (provider === 'credentials' && data) {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
+        const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+        if (!userCredential.user.emailVerified) {
+          await sendEmailVerification(userCredential.user);
+          await signOut(auth);
+          toast({ 
+            title: 'Email not verified', 
+            description: 'Please check your email for verification link. A new verification email has been sent.' 
+          });
+          return;
+        }
+        toast({ title: 'Logged in successfully!' });
+        window.location.href = '/admin';
       }
-      toast({ title: 'Logged in successfully!' });
-      window.location.href = '/admin';
     } catch (error: any) {
       console.error("Sign in error", error);
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
@@ -50,9 +62,13 @@ export const useAuth = () => {
   const handleSignUp = async (data: any) => {
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
-      toast({ title: 'Account created successfully!' });
-      window.location.href = '/admin';
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      await sendEmailVerification(userCredential.user);
+      toast({ 
+        title: 'Account created!', 
+        description: 'Please check your email to verify your account.' 
+      });
+      window.location.href = '/auth';
     } catch (error: any) {
       console.error("Sign up error", error);
       toast({ title: 'Sign Up Failed', description: error.message, variant: 'destructive' });

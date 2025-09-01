@@ -590,6 +590,52 @@ export default function AdminPage() {
         });
     }
 
+    const handleBookingAction = async (bookingId: string, status: 'Approved' | 'Rejected') => {
+        const booking = bookings.find(b => b.id === bookingId);
+        if (!booking) return;
+
+        const updatedBooking = { ...booking, status };
+        const result = await saveData('bookings', bookingId, updatedBooking);
+        
+        if (result.success) {
+            const newBookings = bookings.map(b => b.id === bookingId ? updatedBooking : b);
+            setBookings(newBookings);
+            
+            // Send email notification
+            try {
+                const response = await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: booking.email,
+                        subject: `Booking ${status}: ${booking.eventType} on ${booking.eventDate}`,
+                        text: `Dear ${booking.name},\n\nYour booking for ${booking.eventType} on ${booking.eventDate} has been ${status.toLowerCase()}.\n\nBest regards,\nBhavani Digitals Team`
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to send notification');
+                
+                toast({ 
+                    title: 'Success', 
+                    description: `Booking ${status.toLowerCase()} and notification sent.` 
+                });
+            } catch (error) {
+                console.error('Failed to send notification:', error);
+                toast({ 
+                    title: 'Partial Success', 
+                    description: `Booking ${status.toLowerCase()} but failed to send notification.`,
+                    variant: 'destructive'
+                });
+            }
+        } else {
+            toast({ 
+                title: 'Error', 
+                description: `Failed to ${status.toLowerCase()} booking.`,
+                variant: 'destructive'
+            });
+        }
+    };
+
     return (
         <>
             <Header />
@@ -636,8 +682,8 @@ export default function AdminPage() {
                                                     <p className="pt-2 text-muted-foreground">{booking.notes}</p>
                                                 </CardContent>
                                                 <CardFooter className="flex justify-end gap-2">
-                                                    <Button size="sm" variant="outline">Approve</Button>
-                                                    <Button size="sm" variant="destructive">Reject</Button>
+                                                    <Button size="sm" variant="outline" onClick={() => handleBookingAction(booking.id, 'Approved')}>Approve</Button>
+                                                    <Button size="sm" variant="destructive" onClick={() => handleBookingAction(booking.id, 'Rejected')}>Reject</Button>
                                                 </CardFooter>
                                             </Card>
                                         ))}
@@ -676,8 +722,8 @@ export default function AdminPage() {
                                                     <TableCell>{booking.venue}</TableCell>
                                                     <TableCell className="max-w-[200px] truncate">{booking.notes}</TableCell>
                                                     <TableCell className="text-right space-x-2">
-                                                        <Button size="sm" variant="outline">Approve</Button>
-                                                        <Button size="sm" variant="destructive">Reject</Button>
+                                                        <Button size="sm" variant="outline" onClick={() => handleBookingAction(booking.id, 'Approved')}>Approve</Button>
+                                                        <Button size="sm" variant="destructive" onClick={() => handleBookingAction(booking.id, 'Rejected')}>Reject</Button>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
