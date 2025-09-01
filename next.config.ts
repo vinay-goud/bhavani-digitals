@@ -3,7 +3,7 @@ import type {NextConfig} from 'next';
 
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: true, // Temporarily enable this to get a successful build
+    ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -12,7 +12,7 @@ const nextConfig = {
   distDir: '.next',
   generateBuildId: async () => 'build',
   images: {
-    unoptimized: true, // Enable this for static export
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -34,6 +34,8 @@ const nextConfig = {
       },
     ],
   },
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
 } satisfies NextConfig;
 
 export default nextConfig;

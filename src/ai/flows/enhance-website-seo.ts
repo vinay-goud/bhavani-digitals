@@ -1,7 +1,7 @@
-// The AI analyzes website content and suggests keywords for SEO optimization.
+'use client';
 
-import { ai } from '@/ai/genkit';
-import {z} from 'genkit';
+// The AI analyzes website content and suggests keywords for SEO optimization.
+import { z } from 'genkit';
 
 const SEOEnhancementInputSchema = z.object({
   websiteContent: z
@@ -23,29 +23,11 @@ const SEOEnhancementOutputSchema = z.object({
 
 export type SEOEnhancementOutput = z.infer<typeof SEOEnhancementOutputSchema>;
 
+// Temporary mock function for static build
 export async function enhanceWebsiteSEO(input: SEOEnhancementInput): Promise<SEOEnhancementOutput> {
-  return enhanceWebsiteSEOFlow(input);
+  // Return mock data for static build
+  return {
+    keywords: 'wedding photography, professional photographer, wedding photos, photo sessions',
+    guidance: 'Include these keywords naturally in your website content.'
+  };
 }
-
-const seoEnhancementPrompt = ai.definePrompt({
-  name: 'seoEnhancementPrompt',
-  input: {schema: SEOEnhancementInputSchema},
-  output: {schema: SEOEnhancementOutputSchema},
-  prompt: `Analyze the following website content and suggest relevant keywords for SEO optimization, focusing on wedding photography-related terms. Provide guidance on incorporating these keywords naturally within the content.
-
-Website Content: {{{websiteContent}}}
-
-Keywords:`,
-});
-
-const enhanceWebsiteSEOFlow = ai.defineFlow(
-  {
-    name: 'enhanceWebsiteSEOFlow',
-    inputSchema: SEOEnhancementInputSchema,
-    outputSchema: SEOEnhancementOutputSchema,
-  },
-  async input => {
-    const {output} = await seoEnhancementPrompt(input);
-    return output!;
-  }
-);

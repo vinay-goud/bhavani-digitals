@@ -1,7 +1,8 @@
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
+'use client';
 
-export const ai = genkit({
-  plugins: [googleAI()],
-  model: 'googleai/gemini-2.5-flash',
-});
+// This is a placeholder for client-side initialization
+// The actual AI functionality will be initialized on the client
+export const ai = {
+  definePrompt: () => {},
+  defineFlow: () => {},
+};

@@ -374,7 +374,14 @@ export default function AdminPage() {
         setIsLoadingSeo(true);
         setSeoResult(null);
         try {
-            const result = await enhanceWebsiteSEO(data);
+            const response = await fetch('/api/ai/seo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch');
+            const result = await response.json();
             setSeoResult(result);
         } catch (error) {
             console.error('SEO Enhancement Error:', error);
