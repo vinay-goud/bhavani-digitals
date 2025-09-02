@@ -33,6 +33,9 @@ type GalleryData = {
     [key: string]: GalleryCategory;
 };
 
+// Define the order of categories
+const categoryOrder = ['weddings', 'pre-weddings', 'receptions', 'others'];
+
 const defaultGallery: GalleryData = {
   weddings: { name: 'Weddings', items: [] },
   'pre-weddings': { name: 'Pre-Weddings', items: [] },
@@ -113,14 +116,14 @@ export default function GalleryPage() {
           </div>
           <Tabs defaultValue="weddings" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-secondary h-auto">
-              {Object.keys(categories).map((key) => (
+              {categoryOrder.map((key) => (
                 <TabsTrigger key={key} value={key} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground h-10">
                   {categories[key as CategoryKey].name}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {Object.keys(categories).map((key) => {
+            {categoryOrder.map((key) => {
               const category = categories[key as CategoryKey];
               if (isLoading) {
                   return (

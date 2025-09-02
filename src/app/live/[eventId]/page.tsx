@@ -1,26 +1,35 @@
-// Static page
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import LiveEventClient from './LiveEventClient';
+import { Metadata, ResolvingMetadata } from 'next';
+import { getEventData } from '@/services/dataService';
 
-type LiveEvent = {
-  id: string;
-  title: string;
-  description: string;
-  youtubeUrl: string;
-};
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  // For static export, we'll pre-render a few dummy event IDs
-  return [
-    { eventId: 'event1' },
-    { eventId: 'event2' },
-    { eventId: 'event3' }
-  ];
+type Props = {
+  params: { eventId: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const event = await getEventData(params.eventId);
+  
+  if (!event) {
+    return {
+      title: 'Event Not Found | BDS',
+      description: 'The live event you are looking for does not exist or may have been removed.',
+    }
+  }
+
+  return {
+    title: `${event.title} | BDS Live`,
+    description: event.description,
+  }
+}
+
+export const dynamic = 'force-dynamic';
 
 export default function LiveEventPage({ params }: { params: { eventId: string } }) {
   return (

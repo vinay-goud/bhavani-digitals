@@ -7,14 +7,37 @@ import { Youtube, Loader2 } from 'lucide-react';
 
 // Helper function to extract YouTube Video ID from various URL formats
 const getYouTubeId = (url: string) => {
-    let videoId = '';
-    if (!url) return videoId;
-    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-    const match = url.match(youtubeRegex);
-    if (match && match[1]) {
-        videoId = match[1];
+  if (!url) return '';
+  
+  try {
+    const urlObj = new URL(url);
+    
+    // Handle youtu.be format
+    if (urlObj.hostname === 'youtu.be') {
+      return urlObj.pathname.slice(1);
     }
-    return videoId;
+    
+    // Handle youtube.com format
+    if (urlObj.hostname === 'youtube.com' || urlObj.hostname === 'www.youtube.com') {
+      // Handle /watch?v= format
+      const videoId = urlObj.searchParams.get('v');
+      if (videoId) return videoId;
+      
+      // Handle /embed/ format
+      if (urlObj.pathname.startsWith('/embed/')) {
+        return urlObj.pathname.split('/')[2];
+      }
+      
+      // Handle /v/ format
+      if (urlObj.pathname.startsWith('/v/')) {
+        return urlObj.pathname.split('/')[2];
+      }
+    }
+  } catch (error) {
+    console.error('Invalid YouTube URL:', error);
+  }
+  
+  return '';
 };
 
 type LiveEvent = {
@@ -34,8 +57,18 @@ export default function LiveEventClient({ eventId }: { eventId: string }) {
     }
 
     const fetchEvent = async () => {
-        const eventData = { id: eventId, title: "Sample Event", description: "This is a sample event", youtubeUrl: "" };
-        setEvent(eventData as LiveEvent | null);
+      try {
+        const response = await fetch(`/api/events/${eventId}`);
+        if (!response.ok) {
+          setEvent(null);
+          return;
+        }
+        const data = await response.json();
+        setEvent(data);
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        setEvent(null);
+      }
     };
 
     fetchEvent();

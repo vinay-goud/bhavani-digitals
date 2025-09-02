@@ -1,4 +1,3 @@
-
 import { db, storage } from '@/lib/firebase';
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, writeBatch, query, orderBy } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL, deleteObject } from "firebase/storage";
@@ -122,4 +121,26 @@ export async function saveGalleryData(data: any) {
         console.error(`Error saving gallery data:`, error);
         return { success: false, error: (error as Error).message };
     }
+}
+
+// Live Events Functions
+export type LiveEvent = {
+  id: string;
+  title: string;
+  description: string;
+  youtubeUrl: string;
+  status: 'upcoming' | 'live' | 'ended';
+  scheduledFor?: Date;
+};
+
+export async function getEventData(id: string): Promise<LiveEvent | null> {
+  return await getDataById('events', id) as LiveEvent | null;
+}
+
+export async function saveEventData(id: string, data: Omit<LiveEvent, 'id'>) {
+  return await saveData('events', id, data);
+}
+
+export async function getAllEvents() {
+  return await getData('events') as LiveEvent[];
 }

@@ -16,15 +16,44 @@ import {
 import { auth } from '@/lib/firebase';
 import { useToast } from "@/hooks/use-toast";
 
+import { browserLocalPersistence } from 'firebase/auth';
+
 export const useAuth = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Enable persistent storage
+    auth.setPersistence(browserLocalPersistence);
+    
+    // Check if we have a session stored
+    const lastSession = localStorage.getItem('lastSession');
+    if (lastSession) {
+      const sessionData = JSON.parse(lastSession);
+      const now = new Date().getTime();
+      // If the session is less than 24 hours old, use it
+      if (now - sessionData.timestamp < 24 * 60 * 60 * 1000) {
+        setUser(sessionData.user);
+        setIsLoading(false);
+      }
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setIsLoading(false);
+      if (user) {
+        // Store the session
+        localStorage.setItem('lastSession', JSON.stringify({
+          user: {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          },
+          timestamp: new Date().getTime()
+        }));
+      }
     });
     return () => unsubscribe();
   }, []);
