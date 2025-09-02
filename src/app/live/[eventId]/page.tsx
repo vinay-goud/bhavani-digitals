@@ -29,7 +29,14 @@ export async function generateMetadata(
   }
 }
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+
+export async function generateStaticParams() {
+  // Return at least one param for static export to work
+  return [
+    { eventId: 'default' }
+  ];
+}
 
 export default function LiveEventPage({ params }: { params: { eventId: string } }) {
   return (
