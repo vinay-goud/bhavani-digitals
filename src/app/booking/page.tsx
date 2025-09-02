@@ -161,9 +161,7 @@ export default function BookingPage() {
                         </FormItem>
                       )} />
                     )}
-                    {(form.watch('eventType') === 'wedding' || form.watch('eventType') === 'reception') && (
-                      <>
-                        <FormField control={form.control} name="eventDates" render={({ field }) => (
+                    <FormField control={form.control} name="eventDates" render={({ field }) => (
                           <FormItem className="flex flex-col">
                             <FormLabel>Event Dates</FormLabel>
                             <Popover>
@@ -202,6 +200,8 @@ export default function BookingPage() {
                             <FormMessage />
                           </FormItem>
                         )} />
+                    {(form.watch('eventType') === 'wedding' || form.watch('eventType') === 'reception') && (
+                        <>
                         <FormField control={form.control} name="services" render={({ field }) => (
                           <FormItem>
                             <FormLabel>Services Required</FormLabel>
@@ -260,7 +260,7 @@ export default function BookingPage() {
                             <FormMessage />
                           </FormItem>
                         )} />
-                      </>
+                        </>
                     )}
                   </div>
                   <FormField control={form.control} name="city" render={({ field }) => (

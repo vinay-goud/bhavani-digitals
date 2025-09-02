@@ -165,9 +165,7 @@ export function Header() {
                   )}
                 </nav>
                  <div className="mt-auto p-4 border-t">
-                    <Button asChild variant="outline" className="w-full">
-                      <Link href="/auth" onClick={() => setIsMenuOpen(false)}>Login/Admin</Link>
-                    </Button>
+                    <AuthButton />
                   </div>
               </div>
             </SheetContent>

@@ -636,6 +636,17 @@ export default function AdminPage() {
         }
     };
 
+    const handleDeleteBooking = async (bookingId: string) => {
+        const result = await deleteData('bookings', bookingId);
+        if (result.success) {
+            const newBookings = bookings.filter(b => b.id !== bookingId);
+            setBookings(newBookings);
+            toast({ title: 'Success', description: 'Booking deleted.' });
+        } else {
+            toast({ title: 'Error', description: 'Failed to delete booking.', variant: 'destructive' });
+        }
+    };
+
     return (
         <>
             <Header />
@@ -647,7 +658,7 @@ export default function AdminPage() {
                     </div>
 
                     <Tabs defaultValue="bookings" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 md:grid-cols-8 bg-secondary h-auto md:h-10">
+                        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 bg-secondary h-auto md:h-10 overflow-x-auto">
                             <TabsTrigger value="bookings">Bookings</TabsTrigger>
                             <TabsTrigger value="contacts">Contacts</TabsTrigger>
                             <TabsTrigger value="gallery">Gallery</TabsTrigger>
@@ -720,10 +731,15 @@ export default function AdminPage() {
                                                     <TableCell>{booking.email}</TableCell>
                                                     <TableCell>{booking.phone}</TableCell>
                                                     <TableCell>{booking.venue}</TableCell>
-                                                    <TableCell className="max-w-[200px] truncate">{booking.notes}</TableCell>
-                                                    <TableCell className="text-right space-x-2">
-                                                        <Button size="sm" variant="outline" onClick={() => handleBookingAction(booking.id, 'Approved')}>Approve</Button>
-                                                        <Button size="sm" variant="destructive" onClick={() => handleBookingAction(booking.id, 'Rejected')}>Reject</Button>
+                                                    <TableCell className="max-w-[300px]">
+                                                        <div className="whitespace-pre-wrap break-words text-sm">{booking.notes}</div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex flex-col gap-2 min-w-[120px]">
+                                                            <Button size="sm" variant="outline" onClick={() => handleBookingAction(booking.id, 'Approved')}>Approve</Button>
+                                                            <Button size="sm" variant="destructive" onClick={() => handleBookingAction(booking.id, 'Rejected')}>Reject</Button>
+                                                            <Button size="sm" variant="secondary" onClick={() => handleDeleteBooking(booking.id)}>Delete</Button>
+                                                        </div>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
