@@ -1,14 +1,80 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read access to all documents
-    match /{document=**} {
-      allow read: if true;
+
+    // Helper function to check if the current user is an admin
+    function isAdmin() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
-    
-    // Only allow write access if user is authenticated
-    match /{document=**} {
-      allow write: if request.auth != null;
+
+    // Helper function to check if the user is logged in
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    // --- USER PROFILES ---
+    // Users can read and create their own profile.
+    // Users can update their own profile, but NOT the 'role' field.
+    // Only Admins can update any user's role.
+    match /users/{userId} {
+      allow read: if isLoggedIn();
+      allow create: if isLoggedIn() && request.auth.uid == userId && request.resource.data.role == 'user';
+      allow update: if isLoggedIn() && (
+        // User updating their own non-role fields
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) ||
+        // Admin can update anything
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // --- PUBLIC CONTENT (Read-only for everyone, Admin-write) ---
+    match /heroImages/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /portfolioImages/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /services/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /siteContent/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /content/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /videos/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /liveEvents/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /events/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- BOOKINGS & CONTACTS ---
+    // Anyone logged in can create a booking/contact. Only Admins can read/update/delete.
+    match /bookings/{document=**} {
+      allow read: if isAdmin();
+      allow create: if isLoggedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /contacts/{document=**} {
+      allow read: if isAdmin();
+      allow create: if true; // Public contact form
+      allow update, delete: if isAdmin();
     }
   }
 }

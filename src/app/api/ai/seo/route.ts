@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-static';
+// Note: This is a mock endpoint for static export.
 
 export async function POST(request: Request) {
   try {

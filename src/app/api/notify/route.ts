@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
-export const dynamic = 'force-static';
+// Note: Email functionality requires server-side execution.
+// This route will not work with static export (output: export).
 
 export async function POST(req: Request) {
     try {

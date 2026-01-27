@@ -54,12 +54,12 @@ export async function deleteData(collectionName: string, id: string) {
 
 // Batch update for arrays
 export async function saveOrderedData(collectionName: string, data: any[]) {
-     const batch = writeBatch(db);
-     data.forEach(item => {
-         const docRef = doc(db, collectionName, item.id);
-         batch.set(docRef, item);
-     });
-     try {
+    const batch = writeBatch(db);
+    data.forEach(item => {
+        const docRef = doc(db, collectionName, item.id);
+        batch.set(docRef, item);
+    });
+    try {
         await batch.commit();
         return { success: true };
     } catch (error) {
@@ -95,10 +95,10 @@ export async function deleteFile(path: string) {
 // Specific functions for gallery which is nested
 export async function getGalleryData() {
     const defaultGallery = {
-      weddings: { name: 'Weddings', items: [] },
-      'pre-weddings': { name: 'Pre-Weddings', items: [] },
-      receptions: { name: 'Receptions', items: [] },
-      others: { name: 'Others', items: [] },
+        weddings: { name: 'Weddings', items: [] },
+        'pre-weddings': { name: 'Pre-Weddings', items: [] },
+        receptions: { name: 'Receptions', items: [] },
+        others: { name: 'Others', items: [] },
     };
     try {
         const docRef = doc(db, 'content', 'gallery');
@@ -125,22 +125,112 @@ export async function saveGalleryData(data: any) {
 
 // Live Events Functions
 export type LiveEvent = {
-  id: string;
-  title: string;
-  description: string;
-  youtubeUrl: string;
-  status: 'upcoming' | 'live' | 'ended';
-  scheduledFor?: Date;
+    id: string;
+    title: string;
+    description: string;
+    youtubeUrl: string;
+    status: 'upcoming' | 'live' | 'ended';
+    scheduledFor?: Date;
 };
 
 export async function getEventData(id: string): Promise<LiveEvent | null> {
-  return await getDataById('events', id) as LiveEvent | null;
+    return await getDataById('events', id) as LiveEvent | null;
 }
 
 export async function saveEventData(id: string, data: Omit<LiveEvent, 'id'>) {
-  return await saveData('events', id, data);
+    return await saveData('events', id, data);
 }
 
 export async function getAllEvents() {
-  return await getData('events') as LiveEvent[];
+    return await getData('events') as LiveEvent[];
+}
+
+// ============================================
+// USER MANAGEMENT FUNCTIONS (RBAC)
+// ============================================
+
+export type UserRole = 'admin' | 'user';
+
+export type UserProfile = {
+    uid: string;
+    email: string;
+    displayName: string | null;
+    photoURL: string | null;
+    role: UserRole;
+    createdAt: Date;
+};
+
+/**
+ * Creates a new user profile document in the 'users' collection.
+ * Called after Firebase Auth signup. Defaults role to 'user'.
+ */
+export async function createUserProfile(user: { uid: string; email: string | null; displayName: string | null; photoURL: string | null }) {
+    const userProfile: Omit<UserProfile, 'uid'> & { uid: string } = {
+        uid: user.uid,
+        email: user.email || '',
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        role: 'user', // Default role
+        createdAt: new Date(),
+    };
+
+    try {
+        await setDoc(doc(db, 'users', user.uid), userProfile);
+        return { success: true, profile: userProfile };
+    } catch (error) {
+        console.error('Error creating user profile:', error);
+        return { success: false, error: (error as Error).message };
+    }
+}
+
+/**
+ * Fetches a user's profile from Firestore.
+ */
+export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+    try {
+        const docRef = doc(db, 'users', uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as UserProfile;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+    }
+}
+
+/**
+ * Fetches the role of a user. Returns 'user' as default if profile doesn't exist.
+ */
+export async function getUserRole(uid: string): Promise<UserRole> {
+    const profile = await getUserProfile(uid);
+    return profile?.role || 'user';
+}
+
+/**
+ * Fetches all users (Admin only - enforced by Firestore rules).
+ */
+export async function getUsers(): Promise<UserProfile[]> {
+    try {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        return querySnapshot.docs.map(doc => doc.data() as UserProfile);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+}
+
+/**
+ * Updates a user's role (Admin only - enforced by Firestore rules).
+ */
+export async function updateUserRole(uid: string, role: UserRole) {
+    try {
+        const docRef = doc(db, 'users', uid);
+        await setDoc(docRef, { role }, { merge: true });
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        return { success: false, error: (error as Error).message };
+    }
 }

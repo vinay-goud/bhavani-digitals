@@ -56,12 +56,12 @@ export async function deleteData(collectionName: string, id: string) {
 
 // Batch update for arrays
 export async function saveOrderedData(collectionName: string, data: any[]) {
-     const batch = writeBatch(db);
-     data.forEach(item => {
-         const docRef = doc(db, collectionName, item.id);
-         batch.set(docRef, item);
-     });
-     try {
+    const batch = writeBatch(db);
+    data.forEach(item => {
+        const docRef = doc(db, collectionName, item.id);
+        batch.set(docRef, item);
+    });
+    try {
         await batch.commit();
         return { success: true };
     } catch (error) {
@@ -97,10 +97,10 @@ export async function deleteFile(path: string) {
 // Specific functions for gallery which is nested
 export async function getGalleryData() {
     const defaultGallery = {
-      weddings: { name: 'Weddings', items: [] },
-      'pre-weddings': { name: 'Pre-Weddings', items: [] },
-      receptions: { name: 'Receptions', items: [] },
-      others: { name: 'Others', items: [] },
+        weddings: { name: 'Weddings', items: [] },
+        'pre-weddings': { name: 'Pre-Weddings', items: [] },
+        receptions: { name: 'Receptions', items: [] },
+        others: { name: 'Others', items: [] },
     };
     try {
         const docRef = doc(db, 'content', 'gallery');
@@ -121,6 +121,48 @@ export async function saveGalleryData(data: any) {
         return { success: true };
     } catch (error) {
         console.error(`Error saving gallery data:`, error);
+        return { success: false, error: (error as Error).message };
+    }
+}
+
+// ============================================
+// USER MANAGEMENT FUNCTIONS (RBAC)
+// ============================================
+
+export type UserRole = 'admin' | 'user';
+
+export type UserProfile = {
+    uid: string;
+    email: string;
+    displayName: string | null;
+    photoURL: string | null;
+    role: UserRole;
+    createdAt: Date;
+};
+
+/**
+ * Fetches all users (Admin only - enforced by Firestore rules).
+ */
+export async function getUsers(): Promise<UserProfile[]> {
+    try {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        return querySnapshot.docs.map(doc => doc.data() as UserProfile);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+}
+
+/**
+ * Updates a user's role (Admin only - enforced by Firestore rules).
+ */
+export async function updateUserRole(uid: string, role: UserRole) {
+    try {
+        const docRef = doc(db, 'users', uid);
+        await setDoc(docRef, { role }, { merge: true });
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating user role:', error);
         return { success: false, error: (error as Error).message };
     }
 }
