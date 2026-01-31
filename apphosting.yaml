@@ -5,3 +5,38 @@ run:
   command: npm start
 runConfig:
   maxInstances: 1
+
+env:
+  # ============================================
+  # PUBLIC VARIABLES (needed at BUILD time)
+  # These use secrets but are embedded in client bundle
+  # Run: firebase apphosting:secrets:set <secret-name>
+  # ============================================
+  
+  # Google Maps Platform - Client-side
+  - variable: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    secret: public-google-maps-api-key
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID
+    secret: public-google-maps-map-id
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # ============================================
+  # SERVER-SIDE SECRETS (NOT exposed to browser)
+  # These are only available at RUNTIME
+  # ============================================
+  
+  # Google Maps API Key (for server-side Places API in Lumina AI)
+  - variable: GOOGLE_MAPS_API_KEY
+    secret: google-maps-api-key
+
+  # Lumina AI - Google Gemini
+  - variable: GOOGLE_GENERATIVE_AI_API_KEY
+    secret: gemini-api-key
+  - variable: GEMINI_API_KEY
+    secret: gemini-api-key
+

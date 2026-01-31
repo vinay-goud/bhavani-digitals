@@ -117,7 +117,7 @@ export default function BookingPage() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                     <FormField control={form.control} name="eventType" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Event Type</FormLabel>
@@ -160,7 +160,7 @@ export default function BookingPage() {
                       )} />
                     )}
                     <FormField control={form.control} name="eventDates" render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem>
                         <FormLabel>Event Dates</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>

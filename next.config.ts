@@ -1,5 +1,5 @@
 
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig = {
   typescript: {
@@ -8,11 +8,12 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: 'export',
-  distDir: 'out',
+  // Removed 'output: export' to enable SSR for Firebase App Hosting
+  // distDir removed - using default .next
   generateBuildId: async () => 'build',
   images: {
-    unoptimized: true,
+    // Enable image optimization now that we have SSR
+    unoptimized: false,
     remotePatterns: [
       {
         protocol: 'https',
@@ -29,6 +30,18 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'img.youtube.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.firebasestorage.app',
         port: '',
         pathname: '/**',
       },

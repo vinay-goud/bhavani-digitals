@@ -991,11 +991,11 @@ export default function AdminPage() {
                                         )}
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                             {currentPortfolioItems.map((image: any, index: number) => (
-                                                <div key={image.id || index} className="relative group aspect-[3/4] border rounded-lg overflow-hidden bg-muted">
+                                                <div key={image.id || index} className="relative aspect-[3/4] border rounded-lg overflow-hidden bg-muted">
                                                     <Image src={image.src} alt={image.alt} width={300} height={400} className="object-cover w-full h-full" />
 
-                                                    {/* Overlays */}
-                                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-black/40 p-1 rounded-md backdrop-blur-sm">
+                                                    {/* Delete Button (Always Visible) */}
+                                                    <div className="absolute top-2 right-2 flex gap-1 bg-black/60 p-1 rounded-md backdrop-blur-sm">
                                                         <AlertDialog>
                                                             <AlertDialogTrigger asChild>
                                                                 <Button variant="destructive" size="icon" className="h-7 w-7">
@@ -1019,7 +1019,8 @@ export default function AdminPage() {
                                                         </AlertDialog>
                                                     </div>
 
-                                                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-black/40 p-1 rounded-md backdrop-blur-sm">
+                                                    {/* Reorder Buttons (Always Visible) */}
+                                                    <div className="absolute top-2 left-2 flex gap-1 bg-black/60 p-1 rounded-md backdrop-blur-sm">
                                                         <Button
                                                             variant="secondary"
                                                             size="icon"
@@ -1050,7 +1051,8 @@ export default function AdminPage() {
                                                         </Button>
                                                     </div>
 
-                                                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-xs truncate transform translate-y-full group-hover:translate-y-0 transition-transform">
+                                                    {/* Image Name (Always Visible) */}
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 text-xs truncate">
                                                         {image.alt}
                                                     </div>
                                                 </div>
@@ -1340,9 +1342,9 @@ export default function AdminPage() {
                                         </div>
                                         <div className="space-y-4">
                                             {services.map((service, index) => (
-                                                <Card key={service.id} className="bg-muted/50 relative group">
+                                                <Card key={service.id} className="bg-muted/50 relative">
                                                     {/* Desktop Actions (Top Right) */}
-                                                    <div className="hidden md:flex absolute right-2 top-2 gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 p-1 rounded-md z-10">
+                                                    <div className="hidden md:flex absolute right-2 top-2 gap-1 bg-background/70 p-1 rounded-md z-10 backdrop-blur-sm">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"

@@ -64,8 +64,8 @@ export default function LuminaWidget() {
 
     const pathname = usePathname();
 
-    // Hide on /lumina page
-    if (pathname === '/lumina') return null;
+    // Hide on /lumina page (handle trailing slash and case variations)
+    if (pathname?.toLowerCase().startsWith('/lumina')) return null;
 
     // Closed State - Floating Button
     if (!isOpen) {
