@@ -8,8 +8,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -77,7 +76,6 @@ export default function BookingPage() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <Card className="max-w-2xl mx-auto bg-secondary/30">
@@ -130,7 +128,7 @@ export default function BookingPage() {
                           }
                         }} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-10 w-full">
                               <SelectValue placeholder="Select an event type" />
                             </SelectTrigger>
                           </FormControl>
@@ -162,46 +160,46 @@ export default function BookingPage() {
                       )} />
                     )}
                     <FormField control={form.control} name="eventDates" render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Event Dates</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                      "w-full min-h-[2.5rem] h-auto pl-3 text-left font-normal break-words whitespace-normal",
-                                      !field.value?.length && "text-muted-foreground"
-                                    )}
-                                  >
-                                    <div className="flex-1 overflow-hidden">
-                                      {field.value?.length ? (
-                                        <span className="inline-block">
-                                          {field.value.map(date => format(date, "dd MMM yyyy")).join(", ")}
-                                        </span>
-                                      ) : (
-                                        <span>Select dates</span>
-                                      )}
-                                    </div>
-                                    <CalendarIcon className="ml-2 h-4 w-4 flex-shrink-0 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="multiple"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) => date < new Date()}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Event Dates</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal h-10",
+                                  !field.value?.length && "text-muted-foreground"
+                                )}
+                              >
+                                <div className="flex-1 overflow-hidden">
+                                  {field.value?.length ? (
+                                    <span className="inline-block">
+                                      {field.value.map(date => format(date, "dd MMM yyyy")).join(", ")}
+                                    </span>
+                                  ) : (
+                                    <span>Select dates</span>
+                                  )}
+                                </div>
+                                <CalendarIcon className="ml-2 h-4 w-4 flex-shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="multiple"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) => date < new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
                     {(form.watch('eventType') === 'wedding' || form.watch('eventType') === 'reception') && (
-                        <>
+                      <>
                         <FormField control={form.control} name="services" render={({ field }) => (
                           <FormItem>
                             <FormLabel>Services Required</FormLabel>
@@ -260,7 +258,7 @@ export default function BookingPage() {
                             <FormMessage />
                           </FormItem>
                         )} />
-                        </>
+                      </>
                     )}
                   </div>
                   <FormField control={form.control} name="city" render={({ field }) => (
@@ -286,10 +284,10 @@ export default function BookingPage() {
                     <FormItem>
                       <FormLabel>Function Details</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           placeholder="e.g., 15th Dec - 9 am to 12 pm Haldi, 5 pm to 10 pm Sangeet
-16th Dec - 6 pm to 11 pm Wedding Ceremony" 
-                          {...field} 
+16th Dec - 6 pm to 11 pm Wedding Ceremony"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -324,7 +322,7 @@ export default function BookingPage() {
                         <div className="mt-2 p-4 bg-secondary/50 rounded-lg">
                           <p className="text-sm font-medium">Do I need two teams?</p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            If any of your functions are happening simultaneously/in parallel at two venues then you do require two teams. 
+                            If any of your functions are happening simultaneously/in parallel at two venues then you do require two teams.
                             For example, if the Bride's haldi and the Groom's haldi are happening simultaneously at different venues and you want coverage of both.
                           </p>
                         </div>
@@ -348,7 +346,6 @@ export default function BookingPage() {
           </Card>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import type {Metadata, Viewport} from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Script from 'next/script';
@@ -19,13 +19,18 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { ThemeProvider } from '@/components/theme-provider';
+import LuminaWidget from '@/features/lumina/components/LuminaWidget';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -36,9 +41,21 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="font-body bg-background text-foreground antialiased">
-        {children}
-        <Toaster />
+      <body className="font-body bg-background text-foreground antialiased min-h-screen flex flex-col">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          <div className="flex-1">
+            {children}
+          </div>
+          <Footer />
+          <LuminaWidget />
+          <Toaster />
+        </ThemeProvider>
         <Script id="register-sw" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {

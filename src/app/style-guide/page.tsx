@@ -8,8 +8,7 @@ import * as z from "zod";
 import { Loader2, Wand2 } from 'lucide-react';
 import { generatePhotographyStyleGuide } from '@/ai/flows/generate-photography-style-guide';
 
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -21,7 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsLoggedIn } from '@/hooks/useAuth';
 
 const styleGuideSchema = z.object({
-  shootType: z.string({ required_error: "Please select a shoot type." }),
+  shootType: z.string().min(1, { message: "Please select a shoot type." }),
   desiredVisuals: z.string().min(10, { message: "Please describe the desired visuals." }),
   brandGuidelines: z.string().optional(),
   trendInspirations: z.string().optional(),
@@ -36,7 +35,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
     .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-headline mt-10 mb-6 border-b-2 pb-2">$1</h1>')
     .replace(/^\* (.*$)/gim, '<li class="ml-6 mb-1">$1</li>')
     .replace(/<\/li>\n<li/gim, '</li><li')
-    .replace(/(<li>.*<\/li>)/gis, '<ul class="list-disc pl-4 mb-4">$1</ul>')
+    .replace(/(<li>[\s\S]*?<\/li>)/gi, '<ul class="list-disc pl-4 mb-4">$1</ul>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .split('\n')
@@ -65,7 +64,7 @@ export default function StyleGuidePage() {
 
   useEffect(() => {
     if (!isAuthLoading && !isLoggedIn) {
-        window.location.href = '/auth';
+      window.location.href = '/auth';
     }
   }, [isLoggedIn, isAuthLoading]);
 
@@ -86,18 +85,17 @@ export default function StyleGuidePage() {
       setIsLoading(false);
     }
   }
-  
+
   if (isAuthLoading || !isLoggedIn) {
-      return (
-          <div className="min-h-screen flex items-center justify-center bg-background">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          </div>
-      )
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -200,7 +198,6 @@ export default function StyleGuidePage() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

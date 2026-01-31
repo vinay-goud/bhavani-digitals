@@ -6,17 +6,27 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Reorder } from 'framer-motion';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2, Wand2, Trash2, GripVertical, Mail, Phone, Calendar, MapPin, UploadCloud, Check, PlusCircle, FileUp, Edit, Copy, Heart, Camera, Sparkles, Film, BookOpen, Users, Shield, ShieldOff } from 'lucide-react';
+import { Loader2, Wand2, Trash2, GripVertical, Mail, Phone, Calendar, MapPin, UploadCloud, Check, PlusCircle, FileUp, Edit, Copy, Heart, Camera, Sparkles, Film, BookOpen, Users, Shield, ShieldOff, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, X, Save } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const DroneIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -201,6 +211,7 @@ export default function AdminPage() {
     ]);
     const [bookings, setBookings] = useState<any[]>([]);
     const [contacts, setContacts] = useState<any[]>([]);
+    const [selectedContact, setSelectedContact] = useState<any | null>(null);
     const [gallery, setGallery] = useState<GalleryData>(defaultGallery);
     const [homeContent, setHomeContent] = useState(defaultHomeContent);
     const [currentPortfolioItems, setCurrentPortfolioItems] = useState(defaultHomeContent.portfolioImages);
@@ -374,15 +385,11 @@ export default function AdminPage() {
 
     if (isAuthLoading || isLoading) {
         return (
-            <>
-                <Header />
-                <main className="min-h-screen bg-background py-16 md:py-24 flex items-center justify-center">
-                    <div className="container mx-auto px-4 md:px-6">
-                        <Loader2 className="mx-auto h-12 w-12 animate-spin" />
-                    </div>
-                </main>
-                <Footer />
-            </>
+            <main className="min-h-screen bg-background py-16 md:py-24 flex items-center justify-center">
+                <div className="container mx-auto px-4 md:px-6">
+                    <Loader2 className="mx-auto h-12 w-12 animate-spin" />
+                </div>
+            </main>
         )
     }
 
@@ -665,7 +672,7 @@ export default function AdminPage() {
 
     return (
         <>
-            <Header />
+
             <main className="min-h-screen bg-background py-16 md:py-24">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="mb-12">
@@ -674,16 +681,16 @@ export default function AdminPage() {
                     </div>
 
                     <Tabs defaultValue="bookings" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 bg-secondary h-auto md:h-10 overflow-x-auto">
-                            <TabsTrigger value="bookings">Bookings</TabsTrigger>
-                            <TabsTrigger value="contacts">Contacts</TabsTrigger>
-                            <TabsTrigger value="gallery">Gallery</TabsTrigger>
-                            <TabsTrigger value="home-content">Home Page</TabsTrigger>
-                            <TabsTrigger value="content">Content</TabsTrigger>
-                            <TabsTrigger value="live-events">Live Events</TabsTrigger>
-                            <TabsTrigger value="films">Cinematic Films</TabsTrigger>
-                            <TabsTrigger value="users">Users</TabsTrigger>
-                            <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
+                        <TabsList className="flex flex-wrap h-auto w-full bg-secondary p-1">
+                            <TabsTrigger value="bookings" className="flex-1 min-w-[100px]">Bookings</TabsTrigger>
+                            <TabsTrigger value="contacts" className="flex-1 min-w-[100px]">Contacts</TabsTrigger>
+                            <TabsTrigger value="gallery" className="flex-1 min-w-[100px]">Gallery</TabsTrigger>
+                            <TabsTrigger value="home-content" className="flex-1 min-w-[100px]">Home Page</TabsTrigger>
+                            <TabsTrigger value="content" className="flex-1 min-w-[100px]">Content</TabsTrigger>
+                            <TabsTrigger value="live-events" className="flex-1 min-w-[100px]">Live Events</TabsTrigger>
+                            <TabsTrigger value="films" className="flex-1 min-w-[100px]">Films</TabsTrigger>
+                            <TabsTrigger value="users" className="flex-1 min-w-[100px]">Users</TabsTrigger>
+                            <TabsTrigger value="seo-tools" className="flex-1 min-w-[100px]">SEO</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="bookings" className="mt-8">
@@ -771,43 +778,64 @@ export default function AdminPage() {
                             <Card>
                                 <CardHeader><CardTitle>Contact Form Submissions</CardTitle><CardDescription>View messages from the contact page.</CardDescription></CardHeader>
                                 <CardContent>
-                                    <div className="md:hidden space-y-4">
-                                        {contacts.map((contact) => (
-                                            <Card key={contact.id} className="bg-muted/50">
-                                                <CardHeader>
-                                                    <CardTitle className="text-lg">{contact.name}</CardTitle>
-                                                    <CardDescription>
-                                                        <a href={`mailto:${contact.email}`} className="text-primary hover:underline">{contact.email}</a>
-                                                    </CardDescription>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <h4 className="font-semibold">{contact.subject}</h4>
-                                                    <p className="mt-1 text-sm text-muted-foreground">{contact.message}</p>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                    <div className="hidden md:block overflow-x-auto">
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Name</TableHead>
-                                                    <TableHead>Email</TableHead>
-                                                    <TableHead>Subject</TableHead>
-                                                    <TableHead>Message</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {contacts.map((contact) => (
-                                                    <TableRow key={contact.id}>
-                                                        <TableCell className="font-medium">{contact.name}</TableCell>
-                                                        <TableCell>{contact.email}</TableCell>
-                                                        <TableCell>{contact.subject}</TableCell>
-                                                        <TableCell>{contact.message}</TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
+                                    <div className="flex h-[600px] border rounded-md overflow-hidden bg-background">
+                                        {/* Contact List */}
+                                        <div className={`w-full md:w-1/3 border-r flex flex-col ${selectedContact ? 'hidden md:flex' : 'flex'}`}>
+                                            <div className="p-4 border-b bg-muted/30">
+                                                <h3 className="font-semibold">Inbox ({contacts.length})</h3>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto">
+                                                {contacts.length === 0 ? (
+                                                    <div className="p-8 text-center text-muted-foreground">No messages</div>
+                                                ) : (
+                                                    contacts.map((contact) => (
+                                                        <div
+                                                            key={contact.id}
+                                                            className={`p-4 border-b cursor-pointer hover:bg-muted/50 transition-colors ${selectedContact?.id === contact.id ? 'bg-muted' : ''}`}
+                                                            onClick={() => setSelectedContact(contact)}
+                                                        >
+                                                            <div className="flex justify-between items-start mb-1">
+                                                                <span className="font-medium truncate pr-2">{contact.name}</span>
+                                                                {/* Date date would go here if available */}
+                                                            </div>
+                                                            <div className="text-sm font-medium truncate mb-1">{contact.subject}</div>
+                                                            <div className="text-xs text-muted-foreground line-clamp-2">{contact.message}</div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Contact Detail */}
+                                        <div className={`w-full md:w-2/3 bg-white dark:bg-zinc-950 flex flex-col ${selectedContact ? 'flex' : 'hidden md:flex'}`}>
+                                            {selectedContact ? (
+                                                <>
+                                                    <div className="p-4 border-b flex items-center gap-3 bg-muted/10">
+                                                        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSelectedContact(null)}>
+                                                            <ArrowLeft className="h-4 w-4" />
+                                                        </Button>
+                                                        <div className="flex-1">
+                                                            <h2 className="text-xl font-semibold">{selectedContact.subject}</h2>
+                                                            <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                                                                <span className="font-medium text-foreground">{selectedContact.name}</span>
+                                                                <span>&lt;{selectedContact.email}&gt;</span>
+                                                            </div>
+                                                        </div>
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <a href={`mailto:${selectedContact.email}`}>Reply</a>
+                                                        </Button>
+                                                    </div>
+                                                    <div className="flex-1 p-6 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+                                                        {selectedContact.message}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8">
+                                                    <Mail className="h-16 w-16 mb-4 opacity-20" />
+                                                    <p>Select a message to read</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -961,29 +989,73 @@ export default function AdminPage() {
                                                 <Button onClick={savePortfolioOrder}><Check className="mr-2 h-4 w-4" /> Save Order</Button>
                                             </div>
                                         )}
-                                        <Reorder.Group
-                                            axis="y"
-                                            values={currentPortfolioItems}
-                                            onReorder={setCurrentPortfolioItems}
-                                            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
-                                        >
-                                            {currentPortfolioItems.map((image: any) => (
-                                                <Reorder.Item key={image.id} value={image} className="relative group aspect-[3/4]">
-                                                    <div className="w-full h-full">
-                                                        <Image src={image.src} alt={image.alt} width={300} height={400} className="rounded-lg object-cover w-full h-full" />
-                                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handlePortfolioImageDelete(image.id)}>
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-1 text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity">{image.alt}</div>
-                                                        <div className="absolute top-2 left-2 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <Button variant="secondary" size="icon" className="h-7 w-7"><GripVertical className="h-4 w-4" /></Button>
-                                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                            {currentPortfolioItems.map((image: any, index: number) => (
+                                                <div key={image.id || index} className="relative group aspect-[3/4] border rounded-lg overflow-hidden bg-muted">
+                                                    <Image src={image.src} alt={image.alt} width={300} height={400} className="object-cover w-full h-full" />
+
+                                                    {/* Overlays */}
+                                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-black/40 p-1 rounded-md backdrop-blur-sm">
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button variant="destructive" size="icon" className="h-7 w-7">
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Delete Image?</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        This action cannot be undone. This will permanently remove the image from your portfolio.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction onClick={() => handlePortfolioImageDelete(image.id)} className="bg-destructive hover:bg-destructive/90">
+                                                                        Delete
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
                                                     </div>
-                                                </Reorder.Item>
+
+                                                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-black/40 p-1 rounded-md backdrop-blur-sm">
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="icon"
+                                                            className="h-7 w-7"
+                                                            disabled={index === 0}
+                                                            onClick={() => {
+                                                                const newItems = [...currentPortfolioItems];
+                                                                [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+                                                                setCurrentPortfolioItems(newItems);
+                                                                setPortfolioOrderChanged(true);
+                                                            }}
+                                                        >
+                                                            <ArrowLeft className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="icon"
+                                                            className="h-7 w-7"
+                                                            disabled={index === currentPortfolioItems.length - 1}
+                                                            onClick={() => {
+                                                                const newItems = [...currentPortfolioItems];
+                                                                [newItems[index + 1], newItems[index]] = [newItems[index], newItems[index + 1]];
+                                                                setCurrentPortfolioItems(newItems);
+                                                                setPortfolioOrderChanged(true);
+                                                            }}
+                                                        >
+                                                            <ArrowRight className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-xs truncate transform translate-y-full group-hover:translate-y-0 transition-transform">
+                                                        {image.alt}
+                                                    </div>
+                                                </div>
                                             ))}
-                                        </Reorder.Group>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -1137,24 +1209,82 @@ export default function AdminPage() {
                                     <CardContent>
                                         <div className="space-y-4">
                                             {aboutContent.map((paragraph, index) => (
-                                                <div key={index} className="space-y-2">
-                                                    <FormLabel>Paragraph {index + 1}</FormLabel>
-                                                    <Textarea
-                                                        value={paragraph}
-                                                        onChange={async (e) => {
-                                                            const newContent = [...aboutContent];
-                                                            newContent[index] = e.target.value;
-                                                            const result = await saveData('siteContent', 'about', { id: 'about', about: newContent });
-                                                            if (result.success) {
+                                                <div key={index} className="flex gap-2 items-start">
+                                                    <div className="flex-1 space-y-2">
+                                                        <Label>Paragraph {index + 1}</Label>
+                                                        <Textarea
+                                                            value={paragraph}
+                                                            onChange={(e) => {
+                                                                const newContent = [...aboutContent];
+                                                                newContent[index] = e.target.value;
                                                                 setAboutContent(newContent);
-                                                                toast({ title: 'Success', description: 'About content updated.' });
-                                                            } else {
-                                                                toast({ title: 'Error', description: 'Failed to update about content.', variant: 'destructive' });
-                                                            }
-                                                        }}
-                                                        rows={4}
-                                                        className="resize-none"
-                                                    />
+                                                            }}
+                                                            onBlur={async () => {
+                                                                await saveData('siteContent', 'about', { id: 'about', about: aboutContent });
+                                                                toast({ title: 'Saved', description: 'About content updated.' });
+                                                            }}
+                                                            rows={4}
+                                                            className="resize-none"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col gap-2 pt-8">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            disabled={index === 0}
+                                                            onClick={async () => {
+                                                                const newContent = [...aboutContent];
+                                                                [newContent[index - 1], newContent[index]] = [newContent[index], newContent[index - 1]];
+                                                                setAboutContent(newContent);
+                                                                await saveData('siteContent', 'about', { id: 'about', about: newContent });
+                                                            }}
+                                                        >
+                                                            <ArrowUp className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            disabled={index === aboutContent.length - 1}
+                                                            onClick={async () => {
+                                                                const newContent = [...aboutContent];
+                                                                [newContent[index + 1], newContent[index]] = [newContent[index], newContent[index + 1]];
+                                                                setAboutContent(newContent);
+                                                                await saveData('siteContent', 'about', { id: 'about', about: newContent });
+                                                            }}
+                                                        >
+                                                            <ArrowDown className="h-4 w-4" />
+                                                        </Button>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Delete Paragraph?</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        Are you sure you want to remove this paragraph from the About section?
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction onClick={async () => {
+                                                                        const newContent = aboutContent.filter((_, i) => i !== index);
+                                                                        setAboutContent(newContent);
+                                                                        await saveData('siteContent', 'about', { id: 'about', about: newContent });
+                                                                        toast({ title: 'Deleted', description: 'Paragraph removed.' });
+                                                                    }} className="bg-destructive hover:bg-destructive/90">
+                                                                        Delete
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+                                                    </div>
                                                 </div>
                                             ))}
                                             <Button
@@ -1175,43 +1305,128 @@ export default function AdminPage() {
                                         <CardDescription>Edit your service offerings that appear on the home page.</CardDescription>
                                     </CardHeader>
                                     <CardContent>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <Button
+                                                onClick={async () => {
+                                                    const newService = {
+                                                        id: generateUniqueId(),
+                                                        title: "New Service",
+                                                        icon: "Heart",
+                                                        description: "Description of the new service.",
+                                                        order: services.length // Add to end
+                                                    };
+                                                    // Update local state only
+                                                    setServices([...services, newService]);
+                                                    toast({ title: 'Service Added', description: 'Click Save Changes to persist.' });
+                                                }}
+                                            >
+                                                <PlusCircle className="mr-2 h-4 w-4" /> Add Service
+                                            </Button>
+                                            <Button onClick={async () => {
+                                                // Save all services with current order
+                                                const orderedServices = services.map((s, i) => ({ ...s, order: i }));
+                                                // We can use saveOrderedData to batch save
+                                                // But saveOrderedData expects an array and uses batch.set locally?
+                                                // Let's check dataService.ts - yes, saveOrderedData(collection, data).
+                                                const result = await saveOrderedData('services', orderedServices);
+                                                if (result.success) {
+                                                    toast({ title: 'Success', description: 'Services saved successfully.' });
+                                                } else {
+                                                    toast({ title: 'Error', description: 'Failed to save services.', variant: 'destructive' });
+                                                }
+                                            }}>
+                                                <Save className="mr-2 h-4 w-4" /> Save Changes
+                                            </Button>
+                                        </div>
                                         <div className="space-y-4">
                                             {services.map((service, index) => (
-                                                <Card key={service.id} className="bg-muted/50">
+                                                <Card key={service.id} className="bg-muted/50 relative group">
+                                                    {/* Desktop Actions (Top Right) */}
+                                                    <div className="hidden md:flex absolute right-2 top-2 gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 p-1 rounded-md z-10">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            disabled={index === 0}
+                                                            onClick={async () => {
+                                                                const newServices = [...services];
+                                                                [newServices[index - 1], newServices[index]] = [newServices[index], newServices[index - 1]];
+                                                                setServices(newServices);
+                                                            }}
+                                                        >
+                                                            <ArrowUp className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            disabled={index === services.length - 1}
+                                                            onClick={async () => {
+                                                                const newServices = [...services];
+                                                                [newServices[index + 1], newServices[index]] = [newServices[index], newServices[index + 1]];
+                                                                setServices(newServices);
+                                                            }}
+                                                        >
+                                                            <ArrowDown className="h-4 w-4" />
+                                                        </Button>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Delete Service?</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        Are you sure you want to delete this service? This cannot be undone.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction onClick={async () => {
+                                                                        const result = await deleteData('services', service.id);
+                                                                        if (result.success) {
+                                                                            const newServices = services.filter(s => s.id !== service.id);
+                                                                            setServices(newServices);
+                                                                            toast({ title: 'Deleted', description: 'Service removed.' });
+                                                                        } else {
+                                                                            toast({ title: 'Error', description: 'Failed to delete service.', variant: 'destructive' });
+                                                                        }
+                                                                    }} className="bg-destructive hover:bg-destructive/90">
+                                                                        Delete
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+                                                    </div>
+
                                                     <CardContent className="pt-6">
                                                         <div className="grid gap-4">
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <div className="space-y-2">
-                                                                    <FormLabel>Title</FormLabel>
+                                                                    <Label>Title</Label>
                                                                     <Input
                                                                         value={service.title}
-                                                                        onChange={async (e) => {
+                                                                        onChange={(e) => {
                                                                             const newServices = [...services];
                                                                             newServices[index] = { ...service, title: e.target.value };
-                                                                            const result = await saveData('services', service.id, newServices[index]);
-                                                                            if (result.success) {
-                                                                                setServices(newServices);
-                                                                                toast({ title: 'Success', description: 'Service updated.' });
-                                                                            } else {
-                                                                                toast({ title: 'Error', description: 'Failed to update service.', variant: 'destructive' });
-                                                                            }
+                                                                            setServices(newServices);
                                                                         }}
+                                                                        onBlur={() => { }} // Save removed
                                                                     />
                                                                 </div>
                                                                 <div className="space-y-2">
-                                                                    <FormLabel>Icon</FormLabel>
+                                                                    <Label>Icon</Label>
                                                                     <Select
                                                                         value={service.icon}
                                                                         onValueChange={async (value) => {
                                                                             const newServices = [...services];
-                                                                            newServices[index] = { ...service, icon: value };
-                                                                            const result = await saveData('services', service.id, newServices[index]);
-                                                                            if (result.success) {
-                                                                                setServices(newServices);
-                                                                                toast({ title: 'Success', description: 'Service updated.' });
-                                                                            } else {
-                                                                                toast({ title: 'Error', description: 'Failed to update service.', variant: 'destructive' });
-                                                                            }
+                                                                            const updatedService = { ...service, icon: value };
+                                                                            newServices[index] = updatedService;
+                                                                            setServices(newServices);
                                                                         }}
                                                                     >
                                                                         <SelectTrigger>
@@ -1228,46 +1443,77 @@ export default function AdminPage() {
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <FormLabel>Description</FormLabel>
+                                                                <Label>Description</Label>
                                                                 <Textarea
                                                                     value={service.description}
-                                                                    onChange={async (e) => {
+                                                                    onChange={(e) => {
                                                                         const newServices = [...services];
                                                                         newServices[index] = { ...service, description: e.target.value };
-                                                                        const result = await saveData('services', service.id, newServices[index]);
-                                                                        if (result.success) {
-                                                                            setServices(newServices);
-                                                                            toast({ title: 'Success', description: 'Service updated.' });
-                                                                        } else {
-                                                                            toast({ title: 'Error', description: 'Failed to update service.', variant: 'destructive' });
-                                                                        }
+                                                                        setServices(newServices);
                                                                     }}
                                                                     className="resize-none"
                                                                 />
+                                                            </div>
+
+                                                            {/* Mobile Actions (Bottom Row) */}
+                                                            <div className="md:hidden flex justify-end gap-2 pt-2 border-t mt-2">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    disabled={index === 0}
+                                                                    onClick={() => {
+                                                                        const newServices = [...services];
+                                                                        [newServices[index - 1], newServices[index]] = [newServices[index], newServices[index - 1]];
+                                                                        setServices(newServices);
+                                                                    }}
+                                                                >
+                                                                    <ArrowUp className="h-4 w-4 mr-1" /> Move Up
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    disabled={index === services.length - 1}
+                                                                    onClick={() => {
+                                                                        const newServices = [...services];
+                                                                        [newServices[index + 1], newServices[index]] = [newServices[index], newServices[index + 1]];
+                                                                        setServices(newServices);
+                                                                    }}
+                                                                >
+                                                                    <ArrowDown className="h-4 w-4 mr-1" /> Move Down
+                                                                </Button>
+                                                                <AlertDialog>
+                                                                    <AlertDialogTrigger asChild>
+                                                                        <Button variant="destructive" size="sm">
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </AlertDialogTrigger>
+                                                                    <AlertDialogContent>
+                                                                        <AlertDialogHeader>
+                                                                            <AlertDialogTitle>Delete Service?</AlertDialogTitle>
+                                                                            <AlertDialogDescription>
+                                                                                Are you sure?
+                                                                            </AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter>
+                                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                            <AlertDialogAction onClick={async () => {
+                                                                                const result = await deleteData('services', service.id);
+                                                                                if (result.success) {
+                                                                                    const newServices = services.filter(s => s.id !== service.id);
+                                                                                    setServices(newServices);
+                                                                                    toast({ title: 'Deleted', description: 'Service removed.' });
+                                                                                }
+                                                                            }} className="bg-destructive hover:bg-destructive/90">
+                                                                                Delete
+                                                                            </AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </AlertDialogContent>
+                                                                </AlertDialog>
                                                             </div>
                                                         </div>
                                                     </CardContent>
                                                 </Card>
                                             ))}
-                                            <Button
-                                                onClick={async () => {
-                                                    const newService = {
-                                                        id: generateUniqueId(),
-                                                        title: "New Service",
-                                                        icon: "Heart",
-                                                        description: "Description of the new service."
-                                                    };
-                                                    const result = await saveData('services', newService.id, newService);
-                                                    if (result.success) {
-                                                        setServices([...services, newService]);
-                                                        toast({ title: 'Success', description: 'New service added.' });
-                                                    } else {
-                                                        toast({ title: 'Error', description: 'Failed to add service.', variant: 'destructive' });
-                                                    }
-                                                }}
-                                            >
-                                                <PlusCircle className="mr-2 h-4 w-4" /> Add Service
-                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -1278,7 +1524,7 @@ export default function AdminPage() {
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2"><Users className="text-primary" /> User Management</CardTitle>
-                                    <CardDescription>Manage user roles and permissions. Promote users to Admin or revoke access.</CardDescription>
+                                    <CardDescription>Manage user roles and permissions.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="md:hidden space-y-4">
@@ -1290,10 +1536,10 @@ export default function AdminPage() {
                                                             <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full" />
                                                         ) : (
                                                             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                                                                {user.displayName?.[0] || user.email?.[0] || 'U'}
+                                                                {user.displayName ? user.displayName[0].toUpperCase() : (user.email ? user.email[0].toUpperCase() : 'U')}
                                                             </div>
                                                         )}
-                                                        {user.displayName || 'User'}
+                                                        {user.displayName || user.email?.split('@')[0] || 'User'}
                                                     </CardTitle>
                                                     <CardDescription>{user.email}</CardDescription>
                                                 </CardHeader>
@@ -1362,10 +1608,10 @@ export default function AdminPage() {
                                                                     <img src={user.photoURL} alt="" className="h-8 w-8 rounded-full" />
                                                                 ) : (
                                                                     <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                                                                        {user.displayName?.[0] || user.email?.[0] || 'U'}
+                                                                        {user.displayName ? user.displayName[0].toUpperCase() : (user.email ? user.email[0].toUpperCase() : 'U')}
                                                                     </div>
                                                                 )}
-                                                                <span className="font-medium">{user.displayName || 'User'}</span>
+                                                                <span className="font-medium">{user.displayName || user.email?.split('@')[0] || 'User'}</span>
                                                             </div>
                                                         </TableCell>
                                                         <TableCell>{user.email}</TableCell>
@@ -1476,9 +1722,9 @@ export default function AdminPage() {
                                 </CardContent>
                             </Card>
                         </TabsContent>
-                    </Tabs>
-                </div>
-            </main>
+                    </Tabs >
+                </div >
+            </main >
 
             <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
                 <DialogContent>
@@ -1596,7 +1842,7 @@ export default function AdminPage() {
                 </DialogContent>
             </Dialog>
 
-            <Footer />
+
         </>
     );
 }

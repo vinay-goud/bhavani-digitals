@@ -3,11 +3,20 @@ import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, writeBatch, query,
 import { ref, uploadString, getDownloadURL, deleteObject } from "firebase/storage";
 
 // Generic fetch function
-export async function getData(collectionName: string) {
+export async function getData(collectionName: string, orderByField?: string) {
     try {
-        const q = query(collection(db, collectionName));
+        let q = query(collection(db, collectionName));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as object) }));
+
+        if (orderByField) {
+            return docs.sort((a: any, b: any) => {
+                if (a[orderByField] < b[orderByField]) return -1;
+                if (a[orderByField] > b[orderByField]) return 1;
+                return 0;
+            });
+        }
+        return docs;
     } catch (error) {
         console.error(`Error fetching ${collectionName}:`, error);
         return [];
@@ -57,7 +66,7 @@ export async function saveOrderedData(collectionName: string, data: any[]) {
     const batch = writeBatch(db);
     data.forEach(item => {
         const docRef = doc(db, collectionName, item.id);
-        batch.set(docRef, item);
+        batch.set(docRef, item, { merge: true });
     });
     try {
         await batch.commit();

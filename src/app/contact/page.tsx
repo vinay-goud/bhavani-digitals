@@ -7,14 +7,14 @@ import * as z from "zod";
 import { Mail, MapPin, Phone, MessageCircle } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { saveData } from "@/services/dataService";
+import ContactMap from "@/components/ui/contact-map";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -31,7 +31,7 @@ export default function ContactPage() {
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
   });
-  
+
   async function onSubmit(data: ContactFormValues) {
     const id = `contact_${Date.now()}`;
     const contactData = {
@@ -41,7 +41,7 @@ export default function ContactPage() {
     };
 
     const result = await saveData('contacts', id, contactData);
-    
+
     if (result.success) {
       toast({
         title: "Message Sent!",
@@ -49,7 +49,7 @@ export default function ContactPage() {
       });
       form.reset({ name: '', email: '', subject: '', message: '' });
     } else {
-       toast({
+      toast({
         title: "Submission Failed",
         description: "There was an error sending your message. Please try again.",
         variant: "destructive",
@@ -59,7 +59,6 @@ export default function ContactPage() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-background py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
@@ -76,17 +75,9 @@ export default function ContactPage() {
                   <CardTitle className="font-headline text-2xl">Our Studio</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-body">123 Wedding Lane, Celebration City, 12345</p>
-                  <div className="mt-4 aspect-video w-full rounded-lg overflow-hidden">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.242882208993!2d-122.4214644846816!3d37.78433797975764!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858097b6a6d63d%3A0x4a501367f076adff!2sSan%20Francisco%20City%20Hall!5e0!3m2!1sen!2sus!4v1678901234567"
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen={true}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                  <p className="font-body">Bhavani Digitals Studio, Varni, Nizamabad, Telangana - 503201 </p>
+                  <div className="mt-4 aspect-video w-full rounded-lg overflow-hidden h-[300px] md:h-auto">
+                    <ContactMap />
                   </div>
                 </CardContent>
               </Card>
@@ -96,9 +87,9 @@ export default function ContactPage() {
                   <CardTitle className="font-headline text-2xl">Direct Contact</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 font-body">
-                   <a href="tel:+1234567890" className="flex items-center gap-3 hover:text-primary"><Phone className="h-5 w-5"/> +1 (234) 567-890</a>
-                   <a href="mailto:contact@bhavanidigitals.com" className="flex items-center gap-3 hover:text-primary"><Mail className="h-5 w-5"/> contact@bhavanidigitals.com</a>
-                   <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary"><MessageCircle className="h-5 w-5"/> Chat on WhatsApp</a>
+                  <a href="tel:+91998919255" className="flex items-center gap-3 hover:text-primary"><Phone className="h-5 w-5" /> +91 998919255</a>
+                  <a href="mailto:murali.photo.09@gmail.com" className="flex items-center gap-3 hover:text-primary"><Mail className="h-5 w-5" /> murali.photo.09@gmail.com</a>
+                  <a href="https://wa.me/+91998919255" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary"><MessageCircle className="h-5 w-5" /> Chat on WhatsApp</a>
                 </CardContent>
               </Card>
             </div>
@@ -134,7 +125,6 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

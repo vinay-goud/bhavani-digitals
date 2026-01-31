@@ -1,21 +1,20 @@
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { Card } from '@/components/ui/card';
 import LiveEventClient from './LiveEventClient';
 import { Metadata, ResolvingMetadata } from 'next';
 import { getEventData } from '@/services/dataService';
 
 type Props = {
-  params: { eventId: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ eventId: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(
-  { params }: Props,
+  props: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const params = await props.params;
   const event = await getEventData(params.eventId);
-  
+
   if (!event) {
     return {
       title: 'Event Not Found | BDS',
@@ -34,20 +33,18 @@ export const dynamic = 'force-static';
 export async function generateStaticParams() {
   // Return at least one param for static export to work
   return [
-    { eventId: 'default' }
+    { eventId: 'default' },
+    { eventId: 'default-live-event-1' }
   ];
 }
 
-export default function LiveEventPage({ params }: { params: { eventId: string } }) {
+export default async function LiveEventPage(props: { params: Promise<{ eventId: string }> }) {
+  const params = await props.params;
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-background py-16 md:py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <LiveEventClient eventId={params.eventId} />
-        </div>
-      </main>
-      <Footer />
-    </>
+    <main className="min-h-screen bg-background py-16 md:py-24">
+      <div className="container mx-auto px-4 md:px-6">
+        <LiveEventClient eventId={params.eventId} />
+      </div>
+    </main>
   );
 }
